@@ -13,29 +13,27 @@ const initdb = async () =>
   });
 
 // TODO: Add logic to a method that accepts some content and adds it to the database
+
 export const putDb = async (content) => {
   console.log('PUT from the database');
 
-  //Create a connection to the database
+  // Create a connection to the database
   const jateDb = await openDB('jate', 1);
 
-  //create a new transaction
+  // Create a new transaction
   const tx = jateDb.transaction('jate', 'readwrite');
 
-  //retreive object store 'jate' from the transaction
+  // Retrieve object store 'jate' from the transaction
   const store = tx.objectStore('jate');
+  const data = { id: 1, value: content };
 
   try {
-    // Add the content to the database
-    await store.add(content);
-
-    // Commit the transaction
-    await tx.done;
-    console.log('Content added to the database:', content);
+    const request = store.put(data);
+    await request; // Await the request
+    console.log('Data added or updated successfully');
   } catch (error) {
-    console.error('Error adding content to the database:', error);
+    console.error('Error adding or updating data:', error);
   }
-
 }
 
 // TODO: Add logic for a method that gets all the content from the database
@@ -46,18 +44,19 @@ export const getDb = async () => {
   const jateDb = await openDB('jate', 1);
 
   //create a new transaction
-  const tx = jateDb.transaction('jate', 'readwrite');
+  const tx = jateDb.transaction('jate', 'readonly');
 
   //retreive object store 'jate' from the transaction
   const store = tx.objectStore('jate');
 
   //retrieve all data in the database
-  const request = store.getAll();
+  const request = store.get(1);
 
   //get confirmation the request was successful
   const result = await request;
-  console.log('result.value', result)
-  return result
+  result ? console.log('result.value', result.value) : console.log('no result')
+
+  return result?.value;
 }
 
 initdb();
